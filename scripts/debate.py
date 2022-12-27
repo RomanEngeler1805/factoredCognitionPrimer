@@ -81,7 +81,7 @@ async def _debate(question: str = "Should we legalize all drugs?"):
     debate.append(decision_after)
     return debate
 
-# generate a question
+# MYCODE generate a question and debate
 async def debate():
     prompt = f"""Generate a question for the debate. It should be a yes/no question.
     
