@@ -1,7 +1,7 @@
 from ice.recipe import recipe
 
-DEFAULT_CONTEXT = "We're running a hackathon on 9/9/2022 to decompose complex reasoning tasks into subtasks that are easier to automate & evaluate with language models. Our team is currently breaking down reasoning about the quality of evidence in randomized controlled trials into smaller tasks e.g. placebo, intervention adherence rate, blinding procedure, etc."
-DEFAULT_QUESTION = "What is happening on 9/9/2022?"
+DEFAULT_CONTEXT = "Beth bakes 4x 2 dozen batches of cookies in a week."
+DEFAULT_QUESTION = "If these cookies are shared amongst 16 people equally, how many cookies does each person consume?"
 
 def make_qa_prompt(context: str, question: str) -> str:
     return f"""
@@ -11,7 +11,7 @@ def make_qa_prompt(context: str, question: str) -> str:
 
 
     Question: "{question}"
-    Answer: "
+    Answer: "Let's think step by step.
     """.strip()
 
 async def answer(context: str = DEFAULT_CONTEXT, question: str = DEFAULT_QUESTION) -> str:
