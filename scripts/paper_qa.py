@@ -23,7 +23,7 @@ async def classify_paragraph(paragraph: Paragraph, question: str) -> float:
 
 # rank paragraphs based on the question answer probability
 async def get_relevant_paragraphs(
-    paper: Paper, question: str, top_n: int = 3
+    paper: Paper, question: str, n_tokens: int = 2048
 ) -> list[Paragraph]:
     probs = await map_async(
         paper.paragraphs, lambda par: classify_paragraph(par, question)
@@ -31,6 +31,20 @@ async def get_relevant_paragraphs(
     sorted_pairs = sorted(
         zip(paper.paragraphs, probs), key=lambda x: x[1], reverse=True
     )
+
+    # MYCODE return as many paragraphs as can fit into the prompt (n_tokens)
+    # where len(token) ~= 3.5* #characters
+    top_n = 0
+    prompt_len = 0
+    while (prompt_len+ len(str(sorted_pairs[top_n][0]))) < 3.5* n_tokens:
+        prompt_len += len(str(sorted_pairs[top_n][0]))
+        top_n += 1
+    
+    # an alternative solution could be (though I don't know which is more efficient)
+    # par_lenghts = [len(str(par)) for par, prob in sorted_pairs]
+    # cum_par_lenghts = [sum(par_lenghts[:i]) for i in range(len(par_lenghts))]
+    # find where cum_par_lenghts > 3.5* n_tokens
+
     return [par for par, prob in sorted_pairs[:top_n]]
 
 
