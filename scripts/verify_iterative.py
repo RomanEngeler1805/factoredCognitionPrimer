@@ -24,18 +24,16 @@ def render_prev_steps(steps: list[str]) -> str:
     return f"{steps_text}"
 
 
-def make_improved_prompt(question: str, prev_steps: list[str], next_step: str) -> str:
-    return f"""
-    Given the context 
-    "{render_prev_steps(prev_steps)}"
-
-    Update the current step to answer the question. Show your reasoning.
-
-    Question "{question}"
+def make_improved_prompt(question: str, steps: list[str], curr_idx: int) -> str:
+    return f"""Consider the
+    Question: {question}
     
-    Current answer step: "{next_step}"
-    Updated answer step: "
-    """.strip()
+    Given the reasoning steps:
+    {render_steps(steps)}
+
+    There is a mistake in step {curr_idx}. All previous steps up to {curr_idx} are correct. Improve step {curr_idx}:
+    {curr_idx} 
+    """
 
 # VERIFICATION
 def make_verification_prompt(question: str, steps: list[str]) -> str:
@@ -75,7 +73,7 @@ async def answer(question: str = DEFAULT_QUESTION, MAX_STEPS: int = 2) -> str:
         k_improvements = 0
         while p_correct < 0.8 and k_improvements < MAX_STEPS:
             # make improvements to the current step
-            prompt = make_improved_prompt(question, steps[:k_step], steps[k_step])
+            prompt = make_improved_prompt(question, steps, k_step+1) # +1 because steps are 1-indexed
             answer = await recipe.agent().complete(prompt=prompt, stop='"')
 
             # verify the updated step
@@ -84,7 +82,7 @@ async def answer(question: str = DEFAULT_QUESTION, MAX_STEPS: int = 2) -> str:
             # replace the current step with the updated step if it is more correct
             if p_correct_updated > p_correct:
                 p_correct = p_correct_updated
-                steps[k_step] = answer
+            steps[k_step] = answer
 
             k_improvements += 1
 
