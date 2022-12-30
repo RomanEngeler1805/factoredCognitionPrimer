@@ -82,7 +82,7 @@ async def answer(question: str = DEFAULT_QUESTION, MAX_STEPS: int = 2) -> str:
             # replace the current step with the updated step if it is more correct
             if p_correct_updated > p_correct:
                 p_correct = p_correct_updated
-            steps[k_step] = answer
+                steps[k_step] = answer
 
             k_improvements += 1
 
